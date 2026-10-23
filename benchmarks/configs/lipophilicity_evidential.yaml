@@ -1,0 +1,78 @@
+name: tdc-lipophilicity-evidential
+
+dataset:
+  provider: tdc_adme
+  name: Lipophilicity_AstraZeneca
+  smiles_column: Drug
+  targets:
+    lipophilicity:
+      column: Y
+      unit: log-ratio
+
+features:
+  composition:
+    type: elements
+    elements: [H, C, N, O, S, P, F, Cl, Br, I]
+  bonds:
+    type: bond_pairs
+    elements: [H, C, N, O, S, P, F, Cl, Br, I]
+    bond_orders: ["1", "2", "3", "a"]
+  aromatic:
+    type: smarts
+    pattern: "a"
+    mode: count
+
+routes:
+  lipophilicity: [composition, bonds, aromatic]
+
+tasks:
+  lipophilicity:
+    target: lipophilicity
+    kind: scalar
+    route: lipophilicity
+
+split:
+  method: scaffold
+  fractions: [0.8, 0.1, 0.1]
+  seed: 42
+
+model:
+  structure:
+    encoder: dmpnn
+    hidden_dim: 128
+    depth: 3
+    aggregation: mean
+    dropout: 0.1
+  descriptors:
+    enabled: true
+    hidden_dim: 64
+    depth: 1
+    dropout: 0.1
+  fusion: concat
+  ffn:
+    hidden_dim: 128
+    depth: 2
+    dropout: 0.1
+  head: evidential
+
+training:
+  epochs: 25
+  batch_size: 64
+  learning_rate: 0.001
+  loss: evidential
+  evidential_lambda: 0.1
+  scheduler: cosine
+  warmup_epochs: 3
+  grad_clip: 1.0
+  patience: 10
+  device: auto
+  checkpoint_dir: ../results/checkpoints
+
+evaluation:
+  metrics: [mae, rmse, r2]
+
+analysis:
+  enabled: false
+
+cache:
+  enabled: false

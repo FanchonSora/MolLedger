@@ -1,0 +1,16 @@
+\begin{table}[H]
+\caption{Paired statistics for the duplicate-controlled BBBP sensitivity analysis (10 new scaffold manifests; the same manifests are used for every model). $\bar\Delta$ is $A$ minus $B$ in AUROC; $p_{\mathrm{H}}$ is Holm-adjusted within this table ($m=5$). No comparison in this table survives Holm correction, so every entry is reported as inconclusive. Because the cleaned dataset and its split manifests differ from the primary benchmark, the ranking seen here cannot be attributed to duplicate leakage alone.}\label{tab:bbbp-sensitivity-stats}
+\centering\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lccccr@{}}
+\toprule
+Comparison ($A$ vs $B$) & $\bar\Delta\pm\mathrm{SD}$ & Corrected 95\% interval & $p$ & $p_{\mathrm{H}}$ & Wins of $A$ \\
+\midrule
+Framework hybrid $-$ Framework graph only & $-0.0019\pm0.0393$ & $[-0.0464,0.0426]$ & $0.925$ & $0.925$ & 5/10 \\
+Chemprop hybrid $-$ Chemprop graph only & $+0.0057\pm0.0111$ & $[-0.0068,0.0183]$ & $0.329$ & $0.861$ & 9/10 \\
+Framework hybrid $-$ RDKit 2D + RF & $-0.0303\pm0.0289$ & $[-0.0629,0.0024]$ & $0.065$ & $0.327$ & 2/10 \\
+Framework graph only $-$ RDKit 2D + RF & $-0.0284\pm0.0426$ & $[-0.0766,0.0198]$ & $0.215$ & $0.861$ & 3/10 \\
+Chemprop hybrid $-$ RDKit 2D + RF & $-0.0196\pm0.0307$ & $[-0.0543,0.0150]$ & $0.232$ & $0.861$ & 4/10 \\
+\bottomrule
+\end{tabular}
+\end{table}

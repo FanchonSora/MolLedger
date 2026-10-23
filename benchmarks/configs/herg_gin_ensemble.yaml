@@ -1,0 +1,77 @@
+name: tdc-herg-gin-ensemble
+
+dataset:
+  provider: tdc_tox
+  name: hERG
+  smiles_column: Drug
+  targets:
+    blocker:
+      column: Y
+
+features:
+  composition:
+    type: elements
+    elements: [H, C, N, O, S, P, F, Cl, Br, I]
+  bonds:
+    type: bond_pairs
+    elements: [H, C, N, O, S, P, F, Cl, Br, I]
+    bond_orders: ["1", "2", "3", "a"]
+  aromatic:
+    type: smarts
+    pattern: "a"
+    mode: count
+
+routes:
+  blocker: [composition, bonds, aromatic]
+
+tasks:
+  blocker:
+    target: blocker
+    kind: binary_classification
+    route: blocker
+
+split:
+  method: scaffold
+  fractions: [0.8, 0.1, 0.1]
+  seed: 42
+
+model:
+  structure:
+    encoder: gin
+    hidden_dim: 64
+    depth: 3
+    aggregation: sum
+    dropout: 0.1
+  descriptors:
+    enabled: true
+    hidden_dim: 32
+    depth: 1
+    dropout: 0.1
+  fusion: concat
+  ffn:
+    hidden_dim: 64
+    depth: 2
+    dropout: 0.1
+  head: classification
+
+training:
+  epochs: 25
+  batch_size: 32
+  learning_rate: 0.001
+  loss: bce
+  scheduler: cosine
+  warmup_epochs: 2
+  grad_clip: 1.0
+  patience: 10
+  ensemble_size: 2
+  device: auto
+  checkpoint_dir: ../results/checkpoints
+
+evaluation:
+  metrics: [auroc, auprc, accuracy]
+
+analysis:
+  enabled: false
+
+cache:
+  enabled: false
