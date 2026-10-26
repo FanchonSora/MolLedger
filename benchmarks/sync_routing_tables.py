@@ -1,5 +1,5 @@
 """Synchronise the routing tables (manuscript Table 7 and Additional file 1,
-Table S7) with the archived ten-split routing results, and report the counts
+Table S10) with the archived ten-split routing results, and report the counts
 used in the checkpoint audit sentence.
 
 Run after ``rebuild_routing_audit.py`` has merged the per-dataset audit files.

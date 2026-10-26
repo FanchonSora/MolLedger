@@ -1,14 +1,17 @@
-"""Render the supplementary tables for the two sensitivity analyses.
+"""Render working notes for the two sensitivity analyses as LaTeX fragments.
 
 Two fragments:
 
 * ``tab_hp_sensitivity.tex`` -- the descriptor effect as a function of encoder
-  width (one-factor-at-a-time, FreeSolv, three scaffold splits).
+  width (one-factor-at-a-time, FreeSolv, three scaffold splits). This check is
+  not typeset in the Additional file.
 * ``tab_redundancy.tex`` -- the recommender as a function of the redundancy
-  threshold used by the greedy pruning step ($K=20$ fixed).
+  threshold used by the greedy pruning step ($K=20$ fixed). The typeset
+  counterpart is Table S7 of Additional file 1.
 
 Reads ``hyperparameter_sensitivity.json`` and ``redundancy_sensitivity.json``;
-writes .tex fragments into ``benchmarks/results/paper_tables``.
+writes .tex fragments into ``benchmarks/results/paper_tables``. The fragments are
+not ``\\input`` by any manuscript file.
 """
 from __future__ import annotations
 

@@ -97,23 +97,21 @@ Run from the repository root. Each command writes its output to
 | Table 3/4 (baselines) | `python benchmarks/run_canonical_baselines.py --dataset all` | `baselines_<dataset>_aggregated.json` |
 | Table 8 (role ablation) | `run_modularity_ablation.py`, one endpoint per invocation (loop below) | `modularity_ablation_<dataset>.json` |
 | Table 3/4 (external comparator) | `python benchmarks/run_chemprop_v2_benchmarks.py --dataset all` (chemprop env) | `chemprop_v2_<dataset>.json` |
-| Table 5 and S6/S7 (selectors) | `python benchmarks/run_multivariate_feature_study.py --dataset all` | `multivariate_feature_study_<dataset>.json` |
+| Table 5 and S5/S6 (selectors) | `python benchmarks/run_multivariate_feature_study.py --dataset all` | `multivariate_feature_study_<dataset>.json` |
+| Table S6 (selector statistics) | `python benchmarks/compute_paper_statistics.py` | `paper_statistics.json` |
 | Table S4 (recommended vs random/full) | `python benchmarks/run_feature_evidence_study.py --dataset esol` (repeat for `freesolv`, `bbbp`) | `feature_study_<dataset>.json` |
-| Table S5 (high-repetition random control) | `python benchmarks/run_random_control_study.py --dataset all --draws 50` | `random_control_<dataset>.json` |
-| Table S19 (distribution-free checks) | `python benchmarks/statistical_robustness.py` | `statistical_robustness.json` |
-| Table S21 (sensitivity of the descriptor effect) | `python benchmarks/run_hyperparameter_sensitivity.py --dataset freesolv --splits 1 2 3 --hidden-dims 64 128 256` | `hyperparameter_sensitivity.json` |
-| Table S20 (sensitivity to the redundancy threshold) | `python benchmarks/run_redundancy_sensitivity.py --dataset esol freesolv bbbp --k 20` | `redundancy_sensitivity.json` |
+| Table S4 (high-repetition random control) | `python benchmarks/run_random_control_study.py --dataset all --draws 50` | `random_control_<dataset>.json` |
+| Table S7 (sensitivity to the redundancy threshold) | `python benchmarks/run_redundancy_sensitivity.py --dataset esol freesolv bbbp --k 20` | `redundancy_sensitivity.json` |
 | Descriptor-contract check (Methods) | `python benchmarks/diagnose_descriptor_contract.py --dump` in both environments, then `--compare` | `descriptor_contract_*.npz`, comparison report |
-| ESOL divergence diagnosis | `python benchmarks/diagnose_esol_divergence.py --part extrapolation` (framework env) and `--part framework` / `--part chemprop` | `divergence_diagnosis_*.json` |
-| Table 7, S10/S11 (routing) and S18 (audit) | `python benchmarks/run_evidence_routing_experiment.py --dataset all` then `python benchmarks/rebuild_routing_audit.py` | `evidence_routing_<dataset>.json`, `routing_checkpoint_audit_<dataset>.csv`, `routing_checkpoint_audit.csv` |
+| Table S11 (ESOL divergence diagnosis) | `python benchmarks/diagnose_esol_divergence.py --part extrapolation` (framework env), `--part framework` and `--part chemprop`; the bounded arms add `--clip-z 5` (all seeds), then `--clip-z 5 --seeds 303 403 503 --out-suffix _badseeds` | `divergence_diagnosis_*.json` |
+| Table 7 and S10 (routing) | `python benchmarks/run_evidence_routing_experiment.py --dataset all` then `python benchmarks/rebuild_routing_audit.py` | `evidence_routing_<dataset>.json`, `routing_checkpoint_audit_<dataset>.csv`, `routing_checkpoint_audit.csv` |
 | Table 6 and S3 (structure audit and range shift) | `python benchmarks/run_structure_audit.py` | `duplicate_audit_report.json`, `duplicate_audit_summary.csv`, `bbbp_duplicate_groups.csv`, `ood_shift_all_splits.json` |
-| Table S12 (training-seed variance) | `python benchmarks/run_seed_variance_decomposition.py --dataset bbbp --split-seed 1` | `seed_variance_bbbp_split_1.json` |
-| Table S15 (Caco-2 case study) | `python benchmarks/run_caco2_study.py` | `caco2_study/` results |
-| Tables S16/S17 (BBBP sensitivity) | `python benchmarks/run_bbbp_sensitivity_study.py` and `python benchmarks/run_chemprop_bbbp_sensitivity.py` (chemprop env) | `bbbp_sensitivity_study.json`, `chemprop_bbbp_sensitivity.json` |
+| Table S14 (training-seed variance) | `python benchmarks/run_seed_variance_decomposition.py --dataset bbbp --split-seed 1` | `seed_variance_bbbp_split_1.json` |
+| Table S15 (BBBP sensitivity) | `python benchmarks/run_bbbp_sensitivity_study.py` and `python benchmarks/run_chemprop_bbbp_sensitivity.py` (chemprop env) | `bbbp_sensitivity_study.json`, `chemprop_bbbp_sensitivity.json` |
 | Figures 1-4 | `python benchmarks/make_manuscript_figures.py` | `figures/fig{1..4}_*.pdf` |
 
 Everything else — Tables S1 and S2 (dataset and hyperparameters), S8 and S9
-(paired comparisons) and S13/S14 (secondary metrics and per-split scores) — is
+(paired comparisons) and S12/S13 (per-split scores and secondary metrics) — is
 computed from the files above by the statistics and reporting tools in section 5.
 
 The same sequence is wrapped by one script, which skips any stage whose outputs
@@ -178,11 +176,12 @@ python benchmarks/sync_routing_tables.py         # rewrite the routing rows in t
   comparisons printed in one table (or one dataset block of a table). The family
   sizes are stated in each caption; the adjusted `p`-values are in the
   `holm_p` field and in the captions of the generated tables.
-* `generate_si_tables.py` renders the Additional-file tables whose content is
-  fully determined by the statistics (`tab_int`, `tab_ext`, `tab_mde`,
-  `tab_rec_random`, `tab_selector_stats`, `tab_routing_stats`,
-  `tab_sensitivity_stats`). The remaining descriptive tables are transcribed
-  from the numbers that `report_manuscript_numbers.py` prints.
+* The Additional-file PDFs are typeset from `additional_file_1/additional_file_1.tex`
+  and `additional_file_2/additional_file_2.tex`, which are held with the manuscript
+  sources rather than in this repository; their `\label`s are listed in the roadmap
+  of Table S1 of the main text. The `.tex` fragments written by
+  `generate_robustness_tables.py` and `generate_sensitivity_tables.py` are working
+  notes for the numbers those tables contain, not typeset inputs.
 * `validate_paper_statistics.py` has two modes. `--mode published` checks the 30
   values transcribed from the Supporting Information of the current
   ten-split study; the default `auto`/`consistency` mode recomputes every
@@ -246,11 +245,12 @@ python benchmarks/diagnose_esol_divergence.py --part chemprop \
 * `run_hyperparameter_sensitivity.py` repeats the graph-only and direct-hybrid
   configurations across encoder widths 64/128/256 on the same splits, with every
   other setting held fixed, to show how much of the descriptor effect is a
-  hyper-parameter artefact (Table S21).
+  hyper-parameter artefact. The result is not typeset as a table in the
+  Additional file; it is retained here as a supporting check.
 * `run_redundancy_sensitivity.py` repeats the recommender at redundancy
   thresholds 0.70-0.90 with $K=20$ fixed, and reports both the overlap of the
   selected sets with the default (Jaccard) and the downstream score, to separate
-  instability of the selection from instability of its performance (Table S20).
+  instability of the selection from instability of its performance (Table S7).
 * The divergence diagnosis has two parts beyond description. Six seeds retrain
   the Chemprop configuration on ESOL split 3 without any change, which measures
   how unstable that configuration is on that split. The intervention reruns the

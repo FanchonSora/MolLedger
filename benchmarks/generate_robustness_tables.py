@@ -1,17 +1,23 @@
-"""Render the supplementary tables added for the robustness revision.
+"""Render working notes for the robustness checks as LaTeX fragments.
 
 Two fragments:
 
 * ``tab_random_control.tex`` -- the high-repetition random control: the
   recommender against 50 random subsets per split and budget, in all five
   datasets, with a rank-percentile $p$-value combined over splits (Fisher).
+  The typeset counterpart is Table S4 of Additional file 1, which merges this
+  control with the recommended-versus-full-pool comparison.
 * ``tab_robustness.tex`` -- the distribution-free checks: agreement between the
   Nadeau--Bengio corrected interval and the exact sign-flip permutation test,
   the Friedman/Nemenyi block test over the six selectors, and the routing
-  comparisons against the matched random control.
+  comparisons against the matched random control. These checks support the
+  statistics reported in Table S6 of Additional file 1; the distribution-free
+  and routing rows were not retained as a separate table.
 
 Reads ``random_control_*.json`` and ``statistical_robustness.json``; writes .tex
-fragments into ``benchmarks/results/paper_tables``.
+fragments into ``benchmarks/results/paper_tables``. The fragments are not
+``\\input`` by any manuscript file: the Additional-file tables are typeset from
+the numbers checked against these files.
 """
 from __future__ import annotations
 

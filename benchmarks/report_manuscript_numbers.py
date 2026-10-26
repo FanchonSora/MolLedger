@@ -340,8 +340,8 @@ def _n_test_of(dataset: str, seed: int) -> int:
 
 
 def emit_si_shift_table(results_dir: Path) -> None:
-    """SI Table S2(b): BBBP split rows plus the summary sentence numbers."""
-    section("LaTeX: SI Table S2(b) (BBBP range shift vs role models)")
+    """BBBP per-split range shift alongside the role models (supports Table S3)."""
+    section("LaTeX: BBBP range shift vs role models (source for Table S3)")
     shift = load(results_dir, "ood_shift_all_splits.json")
     ablation = load(results_dir, "modularity_ablation_bbbp.json")
     baselines = load(results_dir, "baselines_bbbp_aggregated.json")
