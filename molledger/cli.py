@@ -318,6 +318,10 @@ def _run_inspect(args: argparse.Namespace) -> int:
     return 0
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows consoles may use a legacy code page that cannot print the report symbols.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(prog="molledger")
     commands = parser.add_subparsers(dest="command", required=True)
     validate = commands.add_parser("validate", help="validate an experiment YAML file")
