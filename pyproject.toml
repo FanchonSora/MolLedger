@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chemistry-framework"
-version = "0.1.0"
+version = "1.0.0"
 description = "Composable blocks for molecular property prediction"
 readme = "README.md"
 license = "MIT"
