@@ -22,7 +22,7 @@ file is correct and the table should be regenerated with the commands below.
 
 | Path | Contents |
 | :--- | :--- |
-| `chemistry_framework/` | The framework package: features, encoders, training, evaluation, advisor, feature analysis. |
+| `molledger/` | The framework package: features, encoders, training, evaluation, advisor, feature analysis. |
 | `benchmarks/` | Runners that produce every reported result, the statistics scripts and the split manifests. |
 | `benchmarks/splits/` | 20 Bemis-Murcko scaffold manifests per endpoint (`<dataset>_seed_<k>.json`), plus the duplicate-controlled BBBP manifests under `bbbp_sensitivity/`. |
 | `benchmarks/results/` | Archived per-split results (JSON/CSV) for the figures and tables of the manuscript, the recomputed statistics (`paper_statistics.json`) and the generated LaTeX table bodies (`paper_tables/`). |
@@ -339,5 +339,5 @@ in parallel is the easiest speed-up.
 
 ## 9. Issues
 
-Please open an issue at <https://github.com/FanchonSora/Chemistry-Framework/issues>
+Please open an issue at <https://github.com/FanchonSora/MolLedger/issues>
 for any mismatch between this repository and the manuscript.

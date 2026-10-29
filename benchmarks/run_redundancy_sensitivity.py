@@ -27,8 +27,8 @@ if str(REPO_ROOT) not in sys.path:
 
 from benchmarks._seeds import add_seed_argument, resolve_seeds  # noqa: E402
 from benchmarks.run_feature_evidence_study import evaluate_subset  # noqa: E402
-from chemistry_framework.feature_analysis import select_evidence_recommendation  # noqa: E402
-from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors  # noqa: E402
+from molledger.feature_analysis import select_evidence_recommendation  # noqa: E402
+from molledger.features.pharmacophore import extract_rdkit_2d_descriptors  # noqa: E402
 
 DATA_DIR = REPO_ROOT / "data" / "moleculenet"
 RESULTS_DIR = REPO_ROOT / "benchmarks" / "results"

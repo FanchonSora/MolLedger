@@ -1,6 +1,6 @@
 # Kiến Trúc Chuyên Sâu Của Repository (Architecture & Technical Deep Dive)
 
-Tài liệu này trình bày chi tiết về **kiến trúc phần mềm**, **thiết kế thuật toán**, **các module cốt lõi**, và **khả năng mở rộng** của `chemistry-framework`.
+Tài liệu này trình bày chi tiết về **kiến trúc phần mềm**, **thiết kế thuật toán**, **các module cốt lõi**, và **khả năng mở rộng** của `molledger`.
 
 ---
 
@@ -28,7 +28,7 @@ Hầu hết các công cụ học máy hóa học hiện nay (như Chemprop, Dee
 - **Thiếu định lượng độ bất định:** Dự đoán điểm (point prediction) không cho biết mức độ tin cậy của mô hình đối với các phân tử ngoài vùng phân phối huấn luyện (out-of-distribution).
 - **Thiếu kiểm tra chất lượng tự động:** Người dùng phải tự phân tích rủi ro dữ liệu, dễ dẫn đến hiện tượng rò rỉ dữ liệu hoặc chọn sai hàm mất mát.
 
-`chemistry-framework` được xây dựng nhằm giải quyết triệt để các vấn đề trên dựa trên 4 nguyên lý:
+`molledger` được xây dựng nhằm giải quyết triệt để các vấn đề trên dựa trên 4 nguyên lý:
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -52,7 +52,7 @@ Hầu hết các công cụ học máy hóa học hiện nay (như Chemprop, Dee
 ## 2. Cấu trúc Thư mục và Các Module Cốt lõi
 
 ```text
-chemistry_framework/
+molledger/
 ├── analysis/               # Cố vấn dữ liệu tự động (DatasetAdvisor) và báo cáo scorecard
 │   ├── advisor.py          # Profiling hóa học, tabular features, target, risks, và auto config
 │   ├── report.py           # Phân tích phân phối binning và khoảng giá trị train vs test
@@ -104,7 +104,7 @@ chemistry_framework/
 
 ### Đồ thị Phân tử & Bộ đệm Dữ liệu (`data`)
 
-Khác với các thư viện đóng gói cồng kềnh, `chemistry-framework` sử dụng cơ chế biểu diễn đồ thị thuần PyTorch tối ưu bộ nhớ:
+Khác với các thư viện đóng gói cồng kềnh, `molledger` sử dụng cơ chế biểu diễn đồ thị thuần PyTorch tối ưu bộ nhớ:
 - **Đặc trưng nguyên tử (`Atom Features` - 133 chiều):**
   - Số hiệu nguyên tử (One-hot 100 nguyên tố).
   - Bậc liên kết (Degree 0–10).
@@ -243,12 +243,12 @@ python benchmarks/run_benchmarks.py
 ## 6. Hướng dẫn Mở rộng Framework (Extensibility Guide)
 
 ### Thêm một Bộ mã hóa Đồ thị mới (Custom Graph Encoder)
-Tạo file mới hoặc kế thừa từ `torch.nn.Module` trong `chemistry_framework/encoders/`:
+Tạo file mới hoặc kế thừa từ `torch.nn.Module` trong `molledger/encoders/`:
 
 ```python
 import torch
 import torch.nn as nn
-from chemistry_framework.data.graph import BatchMolGraph
+from molledger.data.graph import BatchMolGraph
 
 class MyGraphAttentionEncoder(nn.Module):
     def __init__(self, node_dim: int, hidden_dim: int, depth: int = 3):
@@ -264,7 +264,7 @@ class MyGraphAttentionEncoder(nn.Module):
         return pooled_features
 ```
 
-Đăng ký tên encoder mới vào `build_structure_encoder` trong [`chemistry_framework/encoders/gnn.py`](file:///home/nvsinh1/brats_segmentation/teb-net-model/framework/chemistry_framework/encoders/gnn.py).
+Đăng ký tên encoder mới vào `build_structure_encoder` trong [`molledger/encoders/gnn.py`](file:///home/nvsinh1/brats_segmentation/teb-net-model/framework/molledger/encoders/gnn.py).
 
 ### Thêm một Khối Đặc trưng Hóa học mới (Custom Feature Block)
 Trong file cấu hình YAML:
@@ -277,7 +277,7 @@ features:
 ```
 Hoặc đăng ký hàm tính toán vào `FeatureRegistry`:
 ```python
-from chemistry_framework.features import FeatureRegistry, FeatureSpec
+from molledger.features import FeatureRegistry, FeatureSpec
 
 registry = FeatureRegistry()
 registry.register(

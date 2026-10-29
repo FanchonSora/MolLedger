@@ -10,17 +10,17 @@ import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
-from chemistry_framework.analysis import analyze_prediction_molecules
-from chemistry_framework.config import ExperimentConfig
-from chemistry_framework.config.schema import FeatureConfig
-from chemistry_framework.data import make_tensor_dataloaders
-from chemistry_framework.encoders import AtomSMARTSFlags, BondSMARTSFlags
-from chemistry_framework.evaluation import evaluate_model, load_model_checkpoint
-from chemistry_framework.experiment import fit_experiment_prior, prepare_experiment
-from chemistry_framework.features import FeatureCache, MoleculeFeatureBlock, build_feature_registry
-from chemistry_framework.priors import fit_linear_prior
-from chemistry_framework.splits import split_indices
-from chemistry_framework.training import train_model
+from molledger.analysis import analyze_prediction_molecules
+from molledger.config import ExperimentConfig
+from molledger.config.schema import FeatureConfig
+from molledger.data import make_tensor_dataloaders
+from molledger.encoders import AtomSMARTSFlags, BondSMARTSFlags
+from molledger.evaluation import evaluate_model, load_model_checkpoint
+from molledger.experiment import fit_experiment_prior, prepare_experiment
+from molledger.features import FeatureCache, MoleculeFeatureBlock, build_feature_registry
+from molledger.priors import fit_linear_prior
+from molledger.splits import split_indices
+from molledger.training import train_model
 
 def _write_dataset(path) -> None:
     smiles = [
@@ -213,7 +213,7 @@ def test_implicit_hydrogens_only_contribute_to_single_bond_pairs(tmp_path) -> No
 
 def test_smarts_holdout_split_keeps_all_matching_molecules_in_test() -> None:
     smiles = ["CC", "CCC", "CCO", "CCCO", "CC(=O)OC", "CCC(=O)OC", "CCN", "CCCN", "C", "CO"]
-    from chemistry_framework.config import SplitConfig
+    from molledger.config import SplitConfig
 
     split = split_indices(
         smiles,
@@ -289,7 +289,7 @@ def test_tensor_loaders_apply_task_descriptor_route(tmp_path) -> None:
     assert experiment.features.values.shape[1] > 1
 
 def test_classification_config_and_loader_support_binary_and_missing_multilabels(tmp_path) -> None:
-    from chemistry_framework.data import make_tensor_dataloaders
+    from molledger.data import make_tensor_dataloaders
 
     binary_experiment = prepare_experiment(_classification_config(tmp_path))
     binary_loaders = make_tensor_dataloaders(binary_experiment, "activity")
@@ -305,8 +305,8 @@ def test_classification_config_and_loader_support_binary_and_missing_multilabels
     assert torch.isnan(train_targets).any()
 
 def test_tdc_adapter_loads_configured_columns_without_installing_tdc(monkeypatch) -> None:
-    from chemistry_framework.data import load_tdc_dataset
-    from chemistry_framework.config import DatasetConfig
+    from molledger.data import load_tdc_dataset
+    from molledger.config import DatasetConfig
 
     class Frame:
         columns = ["Drug", "Y"]
@@ -347,7 +347,7 @@ def test_training_and_evaluation_work_with_configured_settings(tmp_path) -> None
     train_loader = DataLoader(TensorDataset(x[:14], y[:14]), batch_size=4, shuffle=False)
     validation_loader = DataLoader(TensorDataset(x[14:], y[14:]), batch_size=3)
     model = torch.nn.Linear(1, 1)
-    from chemistry_framework.config import TrainingConfig
+    from molledger.config import TrainingConfig
 
     result = train_model(
         model,
@@ -370,8 +370,8 @@ def test_training_and_evaluation_work_with_configured_settings(tmp_path) -> None
     assert restored_metrics["mae"] == pytest.approx(metrics["mae"])
 
 def test_binary_training_and_classification_metrics_support_missing_labels() -> None:
-    from chemistry_framework.config import TrainingConfig
-    from chemistry_framework.evaluation import evaluate_model
+    from molledger.config import TrainingConfig
+    from molledger.evaluation import evaluate_model
 
     inputs = torch.tensor([[-2.0], [-1.0], [1.0], [2.0], [3.0]])
     targets = torch.tensor([0.0, 0.0, 1.0, 1.0, float("nan")])
@@ -408,7 +408,7 @@ def test_binary_training_and_classification_metrics_support_missing_labels() -> 
     assert actual.shape == predicted.shape == (5,)
 
 def test_auprc_groups_examples_with_tied_scores() -> None:
-    from chemistry_framework.evaluation import classification_metrics
+    from molledger.evaluation import classification_metrics
 
     metrics = classification_metrics(
         [1, 0, 1, 0],

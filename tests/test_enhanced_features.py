@@ -5,8 +5,8 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
-from chemistry_framework.config import ExperimentConfig, ModelSpec, TrainingConfig, load_config
-from chemistry_framework.inputs import (
+from molledger.config import ExperimentConfig, ModelSpec, TrainingConfig, load_config
+from molledger.inputs import (
     ComplexAdapter,
     ComplexObject,
     MixtureAdapter,
@@ -14,7 +14,7 @@ from chemistry_framework.inputs import (
     available_input_formats,
     get_input_adapter,
 )
-from chemistry_framework.data import (
+from molledger.data import (
     BatchMolGraph,
     ChemistryDataset,
     MolGraph,
@@ -22,28 +22,28 @@ from chemistry_framework.data import (
     mol_to_graph,
     make_experiment_dataloaders,
 )
-from chemistry_framework.encoders import (
+from molledger.encoders import (
     DMPNNEncoder,
     EGNNEncoder,
     GINEncoder,
     GraphAggregation,
     ProteinEncoder,
 )
-from chemistry_framework.experiment import prepare_experiment
-from chemistry_framework.heads import (
+from molledger.experiment import prepare_experiment
+from molledger.heads import (
     EvidentialRegressionHead,
     GaussianNLLHead,
     MultiTaskHead,
     NodeLevelHead,
 )
-from chemistry_framework.models import (
+from molledger.models import (
     EnsembleModel,
     HybridChemistryModel,
     build_hybrid_model,
 )
-from chemistry_framework.training import TrainingResult, train_ensemble, train_model
-from chemistry_framework.training.engine import _evidential_loss, _gaussian_nll_loss
-from chemistry_framework.cli import main as cli_main
+from molledger.training import TrainingResult, train_ensemble, train_model
+from molledger.training.engine import _evidential_loss, _gaussian_nll_loss
+from molledger.cli import main as cli_main
 
 def test_input_adapters():
     """Test Mixture and Complex adapters and registry."""
@@ -108,7 +108,7 @@ def test_encoders_forward():
 
     prot_encoder = ProteinEncoder(embedding_dim=16, channels=32)
     seqs = ["MVLSPADKTNVKAAWGKVGAHAGEYGAEALERMFLSFPTTKTYFPHFDLSHGSAQVKGHGKKVADALTNAVAHVDDMPNALSA", "ACDEFGHIKLMNPQRSTVWY"]
-    from chemistry_framework.data.loaders import _tokenize_protein
+    from molledger.data.loaders import _tokenize_protein
     tokens = torch.stack([_tokenize_protein(s) for s in seqs])
     out_prot = prot_encoder(tokens)
     assert out_prot.shape == (2, 32)

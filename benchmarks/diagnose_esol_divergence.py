@@ -40,7 +40,7 @@ SPLIT = 3  # the split on which both descriptor hybrids failed on ESOL
 
 def _esol_split(split: int = SPLIT):
     from sklearn.preprocessing import StandardScaler
-    from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors
+    from molledger.features.pharmacophore import extract_rdkit_2d_descriptors
 
     manifest = json.loads((DATA_DIR / "dataset_manifest.json").read_text())["esol"]
     df = pd.read_csv(REPO_ROOT / manifest["clean_csv"])
@@ -152,7 +152,7 @@ def extreme_standardised_inputs(threshold: float = 5.0) -> dict[str, Any]:
 def framework_part(seeds_test: list[int]) -> dict[str, Any]:
     import torch
     from sklearn.linear_model import Ridge
-    from chemistry_framework.feature_analysis import select_evidence_recommendation
+    from molledger.feature_analysis import select_evidence_recommendation
     from benchmarks.run_evidence_routing_experiment import (
         DirectHybridGNN,
         MoleculeGraphDataset,
@@ -160,7 +160,7 @@ def framework_part(seeds_test: list[int]) -> dict[str, Any]:
         collate_graph_batch,
         train_and_eval_model,
     )
-    from chemistry_framework.data.graph import mol_to_graph
+    from molledger.data.graph import mol_to_graph
     from torch.utils.data import DataLoader
 
     torch.set_num_threads(4)
@@ -252,7 +252,7 @@ def chemprop_part(seeds_test: list[int], clip_z: float | None = None) -> dict[st
     from sklearn.preprocessing import StandardScaler
     from benchmarks._descriptor_contract import select_contract_columns
     from benchmarks.run_chemprop_v2_benchmarks import build_chemprop_mpnn
-    from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors
+    from molledger.features.pharmacophore import extract_rdkit_2d_descriptors
 
     torch.set_num_threads(4)
     df = pd.read_csv(DATA_DIR / "esol_clean.csv")

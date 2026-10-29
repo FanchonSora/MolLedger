@@ -1,12 +1,12 @@
-# Citation metadata for the chemistry-framework software release.
+# Citation metadata for the molledger software release.
 #
 # The archived version is the GitHub release tagged v1.0.0 in this repository;
 # cite that tag rather than the moving default branch.
 cff-version: 1.2.0
 message: "If you use this software, please cite the manuscript and the archived release."
-title: "chemistry-framework: a configuration-driven and replayable workflow for molecular property modelling"
+title: "molledger: a configuration-driven and replayable workflow for molecular property modelling"
 abstract: >-
-  Open-source workflow for the manuscript "chemistry-framework: a
+  Open-source workflow for the manuscript "molledger: a
   configuration-driven and replayable workflow for molecular property modelling":
   schema-validated configuration and command-line workflow, training-partition
   feature evidence scorecard, evidence-guided descriptor recommender, modular
@@ -16,8 +16,8 @@ type: software
 version: "1.0.0"
 date-released: "2026-10-19"
 license: MIT
-repository-code: "https://github.com/FanchonSora/Chemistry-Framework"
-url: "https://github.com/FanchonSora/Chemistry-Framework"
+repository-code: "https://github.com/FanchonSora/MolLedger"
+url: "https://github.com/FanchonSora/MolLedger"
 keywords:
   - cheminformatics
   - molecular property prediction

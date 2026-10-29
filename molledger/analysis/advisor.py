@@ -104,6 +104,13 @@ class ChemicalProfile:
     tanimoto_diversity_score: float = 1.0
     property_stats: dict[str, PropertySummary] = field(default_factory=dict)
     invalid_examples: list[tuple[int, str]] = field(default_factory=list)
+    # Structure-level audit (InChIKey). A structure with several records is
+    # conflicting when its labels disagree (classification) or span more than
+    # half the standard deviation of the target (regression).
+    inchikey_duplicated_structures: int = 0
+    inchikey_duplicated_records: int = 0
+    conflicting_structures: int = 0
+    conflicting_structure_rows: list[dict[str, Any]] = field(default_factory=list)
 
 @dataclass
 class TargetProfile:
@@ -256,6 +263,59 @@ def _calc_stats(arr: np.ndarray, name: str) -> PropertySummary:
         max=float(valid.max()),
     )
 
+def _structure_conflicts(
+    smiles_list: Sequence[str],
+    target_values: Sequence[Any],
+    is_classification: bool,
+) -> tuple[int, int, int, list[dict[str, Any]]]:
+    """Audit repeated structures by InChIKey.
+
+    Returns (duplicated structures, their records, conflicting structures, and the
+    conflicting groups as rows of InChIKey, labels and SMILES). A duplicated
+    structure conflicts when its labels disagree (classification) or span more
+    than half the standard deviation of the target (regression), the rule used in
+    the manuscript's structure audit.
+    """
+    groups: dict[str, list[int]] = {}
+    targets: list[float] = []
+    smiles_kept: list[str] = []
+    for smi, value in zip(smiles_list, target_values):
+        mol = Chem.MolFromSmiles(str(smi).strip())
+        if mol is None:
+            continue
+        key = Chem.MolToInchiKey(mol)
+        if not key:
+            continue
+        groups.setdefault(key, []).append(len(targets))
+        targets.append(float(value))
+        smiles_kept.append(str(smi).strip())
+
+    if not targets:
+        return 0, 0, 0, []
+    values = np.asarray(targets, dtype=float)
+    threshold = 0.5 * float(np.std(values))
+
+    duplicated = {key: idx for key, idx in groups.items() if len(idx) > 1}
+    conflict_rows: list[dict[str, Any]] = []
+    for key, idx in duplicated.items():
+        group = values[idx]
+        if is_classification:
+            conflict = len(np.unique(group)) > 1
+        else:
+            conflict = float(group.max() - group.min()) > threshold
+        if conflict:
+            conflict_rows.append(
+                {
+                    "inchikey": key,
+                    "labels": [float(v) for v in group],
+                    "smiles": [smiles_kept[i] for i in idx],
+                }
+            )
+    conflict_rows.sort(key=lambda row: row["inchikey"])
+    duplicated_records = sum(len(idx) for idx in duplicated.values())
+    return len(duplicated), duplicated_records, len(conflict_rows), conflict_rows
+
+
 class DatasetAdvisor:
     def __init__(self, seed: int = 42) -> None:
         self.seed = seed
@@ -305,6 +365,16 @@ class DatasetAdvisor:
         duplicate_count = total - unique_smiles_count
         scaffold_ratio = len(scaffolds_set) / max(1, valid_count)
 
+        primary_name = next(iter(targets), None)
+        primary_values = list(targets[primary_name]) if primary_name is not None else []
+        is_classification = (
+            primary_name is not None
+            and self._profile_target(primary_name, primary_values).task_kind == "binary_classification"
+        )
+        dup_structures, dup_records, conflicting, conflict_rows = _structure_conflicts(
+            smiles_list, primary_values, is_classification
+        )
+
         tanimoto_sim = 0.0
         tanimoto_diversity = 1.0
         if len(valid_mols) > 1:
@@ -342,6 +412,10 @@ class DatasetAdvisor:
             tanimoto_diversity_score=tanimoto_diversity,
             property_stats=prop_stats,
             invalid_examples=invalid_examples[:10],
+            inchikey_duplicated_structures=dup_structures,
+            inchikey_duplicated_records=dup_records,
+            conflicting_structures=conflicting,
+            conflicting_structure_rows=conflict_rows,
         )
 
         target_profiles: dict[str, TargetProfile] = {}
@@ -691,6 +765,22 @@ class DatasetAdvisor:
                 )
             )
 
+        if chem.conflicting_structures > 0:
+            score -= 10
+            risks.append(
+                RiskItem(
+                    severity="HIGH",
+                    category="data_quality",
+                    title="Conflicting Labels on Repeated Structures",
+                    message=(
+                        f"{chem.conflicting_structures} structures appear more than once with conflicting labels "
+                        f"({chem.inchikey_duplicated_structures} repeated structures in total, "
+                        f"{chem.inchikey_duplicated_records} records)."
+                    ),
+                    recommendation="Inspect the listed InChIKeys and resolve each conflict before splitting; remove or relabel the conflicting records.",
+                )
+            )
+
         if chem.total_records < 300:
             score -= 15
             risks.append(
@@ -1012,7 +1102,7 @@ class DatasetAdvisor:
         lines = [
             "",
             "=" * 78,
-            f" 🧪 CHEMISTRY FRAMEWORK: DATASET HEALTH & ADVISORY REPORT",
+            f" 🧪 MOLLEDGER: DATASET HEALTH & ADVISORY REPORT",
             "=" * 78,
             f" Dataset: {report.dataset_name:<30} Health Score: {rec.health_score}/100 [{status_badge}]",
             "-" * 78,
@@ -1020,6 +1110,7 @@ class DatasetAdvisor:
             f" • Unique Scaffolds:     {chem.unique_scaffolds_count:<10} • Scaffold Diversity: {chem.scaffold_diversity_ratio:.2f}",
             f" • Mean Tanimoto Sim:    {chem.mean_tanimoto_similarity:<10.2f} • Tanimoto Diversity: {chem.tanimoto_diversity_score:.2f}",
             f" • Duplicate Molecules:   {chem.duplicate_count:<10} • Invalid SMILES:     {chem.invalid_smiles_count}",
+            f" • Duplicated structures (InChIKey): {chem.inchikey_duplicated_structures} ({chem.inchikey_duplicated_records} records), conflicting labels: {chem.conflicting_structures}",
             "-" * 78,
             " 📊 KEY CHEMICAL PROPERTY DISTRIBUTIONS (Mean ± Std [Min, Max]):",
         ]
@@ -1110,6 +1201,24 @@ class DatasetAdvisor:
         ])
         for p_name, s in chem.property_stats.items():
             lines.append(f"| **{p_name}** | {s.mean:.1f} ± {s.std:.1f} | {s.q25:.1f} | {s.median:.1f} | {s.q75:.1f} | [{s.min:.1f}, {s.max:.1f}] |")
+
+        lines.extend([
+            "",
+            "### Repeated Structures (InChIKey Audit)",
+            "",
+            f"- **Repeated structures**: `{chem.inchikey_duplicated_structures}` covering `{chem.inchikey_duplicated_records}` records",
+            f"- **Conflicting labels**: `{chem.conflicting_structures}`",
+        ])
+        if chem.conflicting_structure_rows:
+            lines.extend([
+                "",
+                "| InChIKey | Labels of each record | SMILES |",
+                "| :--- | :--- | :--- |",
+            ])
+            for row in chem.conflicting_structure_rows:
+                labels = ", ".join(f"{v:g}" for v in row["labels"])
+                smiles = "<br>".join(f"`{s}`" for s in row["smiles"])
+                lines.append(f"| `{row['inchikey']}` | {labels} | {smiles} |")
 
         if tab is not None and tab.feature_count > 0:
             lines.extend([

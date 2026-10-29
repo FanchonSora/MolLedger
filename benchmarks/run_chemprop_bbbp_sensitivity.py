@@ -26,7 +26,7 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
-from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors
+from molledger.features.pharmacophore import extract_rdkit_2d_descriptors
 from benchmarks._descriptor_contract import select_contract_columns
 from benchmarks._seeds import add_seed_argument, resolve_seeds
 

@@ -1,6 +1,6 @@
 # Quick start
 
-`chemistry-framework` turns one plain-text configuration file into a trained,
+`molledger` turns one plain-text configuration file into a trained,
 recorded experiment. This page is the five-minute path; the manuscript benchmark
 suite is described in `../REPRODUCING.md`, and every configuration key is listed
 in `configuration.md`.
@@ -20,7 +20,7 @@ pip install "rdkit==2023.09.6"        # the version behind the published descrip
 ## 2. Look at the data before modelling it
 
 ```bash
-chemistry-framework inspect my_table.csv --smiles-column smiles --target logS --output-dir reports/
+molledger inspect my_table.csv --smiles-column smiles --target logS --output-dir reports/
 ```
 
 `inspect` reports SMILES validity, repeated SMILES, scaffold and fingerprint
@@ -67,7 +67,7 @@ model:
 Everything is validated against a typed schema before any computation runs:
 
 ```bash
-chemistry-framework validate my_experiment.yaml
+molledger validate my_experiment.yaml
 ```
 
 Unknown keys, unknown feature names, and routes that reference undefined blocks
@@ -76,9 +76,9 @@ are errors, not silent defaults.
 ## 4. Run it
 
 ```bash
-chemistry-framework prepare my_experiment.yaml            # featurise, cache, hash the definitions
-chemistry-framework train   my_experiment.yaml            # fit, evaluate, write the run record
-chemistry-framework predict --checkpoint <run>/model.pt  --input new_table.csv --output predictions.csv
+molledger prepare my_experiment.yaml            # featurise, cache, hash the definitions
+molledger train   my_experiment.yaml            # fit, evaluate, write the run record
+molledger predict --checkpoint <run>/model.pt  --input new_table.csv --output predictions.csv
 ```
 
 `train` writes the checkpoint together with the resolved configuration, its
@@ -89,7 +89,7 @@ test partition is read once, for the final evaluation.
 ## 5. Read the evidence
 
 ```bash
-chemistry-framework analyze my_experiment.yaml --inspect
+molledger analyze my_experiment.yaml --inspect
 ```
 
 This writes, next to the run record:

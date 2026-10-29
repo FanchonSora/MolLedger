@@ -62,15 +62,15 @@ class HybridChemistryModel(nn.Module):
 
     def forward(self, inputs: Any = None, descriptor_features: Tensor | None = None, prior_features: Tensor | None = None, **kwargs: Any,) -> dict[str, Tensor]:
         structure_input = kwargs.get("batch_graph") or kwargs.get("graph") or kwargs.get("structure")
-        desc_input = descriptor_features or kwargs.get("descriptors")
-        pri_input = prior_features or kwargs.get("prior") or kwargs.get("prior_features")
+        desc_input = descriptor_features if descriptor_features is not None else kwargs.get("descriptors")
+        pri_input = prior_features if prior_features is not None else (kwargs.get("prior") if kwargs.get("prior") is not None else kwargs.get("prior_features"))
         if isinstance(inputs, dict):
             if structure_input is None:
                 structure_input = inputs.get("graph") or inputs.get("structure")
             if desc_input is None:
                 desc_input = inputs.get("descriptors")
             if pri_input is None:
-                pri_input = inputs.get("prior") or inputs.get("prior_features")
+                pri_input = inputs.get("prior") if inputs.get("prior") is not None else inputs.get("prior_features")
         elif isinstance(inputs, BatchMolGraph) or (isinstance(inputs, (list, tuple)) and inputs and isinstance(inputs[0], str)):
             if structure_input is None:
                 structure_input = inputs

@@ -85,7 +85,7 @@ def load_tdc_dataset(dataset_config: DatasetConfig) -> MolecularDataset:
         tdc_single_pred = importlib.import_module("tdc.single_pred")
     except ImportError as exc:
         raise ImportError(
-            "PyTDC is required for TDC datasets; install chemistry-framework[benchmark]"
+            "PyTDC is required for TDC datasets; install molledger[benchmark]"
         ) from exc
     dataset_class_name = "ADME" if dataset_config.provider == "tdc_adme" else "Tox"
     dataset_type = getattr(tdc_single_pred, dataset_class_name, None)

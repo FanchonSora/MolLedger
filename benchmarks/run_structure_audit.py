@@ -36,7 +36,7 @@ Definitions
 * A descriptor is out of distribution for a split when at least one test value
   falls outside the closed training range of that descriptor.  Descriptor
   values are the ones produced by
-  :func:`chemistry_framework.features.pharmacophore.extract_rdkit_2d_descriptors`,
+  :func:`molledger.features.pharmacophore.extract_rdkit_2d_descriptors`,
   which replaces non-finite values with zero.
 
 The number of descriptors in the block is read from the extractor rather than
@@ -259,7 +259,7 @@ def audit_ood_shift(dataset: str, meta: dict[str, Any], seeds: list[int]) -> lis
     # Imported lazily: the duplicate inventory above does not need the full
     # framework import chain, and the audit should stay runnable on a machine
     # where only RDKit and pandas are installed.
-    from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors
+    from molledger.features.pharmacophore import extract_rdkit_2d_descriptors
 
     from benchmarks._descriptor_contract import select_contract_columns
 

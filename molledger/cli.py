@@ -13,8 +13,31 @@ from .data.loaders import make_experiment_dataloaders
 from .evaluation.metrics import evaluate_model, load_model_checkpoint
 from .experiment import fit_experiment_prior, prepare_experiment
 from .models.hybrid import build_hybrid_model
+from .priors.additive import LinearAdditivePrior
 from .training.engine import train_ensemble, train_model
 from .analysis.advisor import DatasetAdvisor
+
+
+def _prior_metadata(prior_obj: Any) -> dict[str, Any] | None:
+    """Serialise a fitted linear prior so predict can rebuild the same module shape."""
+    if prior_obj is None:
+        return None
+    return {
+        "coefficients": prior_obj.coefficients.detach().cpu().tolist(),
+        "intercept": prior_obj.intercept.detach().cpu().tolist(),
+        "feature_names": list(prior_obj.feature_names) if prior_obj.feature_names is not None else None,
+    }
+
+
+def _prior_from_metadata(meta: dict[str, Any]) -> LinearAdditivePrior | None:
+    stored = meta.get("prior")
+    if not stored:
+        return None
+    return LinearAdditivePrior(
+        stored["coefficients"],
+        intercept=stored["intercept"],
+        feature_names=stored.get("feature_names"),
+    )
 
 def _run_train(args: argparse.Namespace) -> int:
     config = load_config(args.config)
@@ -81,6 +104,10 @@ def _run_train(args: argparse.Namespace) -> int:
         "out_dim": out_dim,
         "descriptor_dim": desc_dim,
         "model_spec": config.model,
+        "prior": _prior_metadata(prior_obj),
+        # predict rebuilds the descriptor and prior inputs from these, exactly as train did.
+        "config": config,
+        "train_smiles": [str(prepared.dataset.smiles[int(i)]) for i in prepared.split.train],
     }
     if config.training.ensemble_size > 1:
         model, results = train_ensemble(
@@ -134,6 +161,49 @@ def _run_train(args: argparse.Namespace) -> int:
     )
     return 0
 
+def _predict_feature_inputs(metadata: dict[str, Any], smiles_list: list[str]) -> tuple[np.ndarray | None, np.ndarray | None]:
+    """Rebuild the descriptor and prior inputs for new molecules, as train did for its split.
+
+    The feature registry is rebuilt from the stored training SMILES, so training-dependent
+    features (Benson group counts) keep the same definitions as in training.
+    """
+    from .experiment import _resolve_blocks
+    from .features import MoleculeFeatureBlock, build_feature_registry
+
+    config = metadata.get("config")
+    if config is None or "train_smiles" not in metadata:
+        raise ValueError(
+            "checkpoint lacks the configuration needed for predict; retrain with this version of molledger"
+        )
+    task = config.tasks.get(metadata.get("task_name"), {})
+    train_smiles = metadata["train_smiles"]
+    registry, blocks = build_feature_registry(
+        config.features, train_smiles, list(range(len(train_smiles)))
+    )
+    all_names = tuple(name for names in blocks.values() for name in names)
+    values = MoleculeFeatureBlock(registry, all_names).transform(smiles_list).values
+    column = {name: idx for idx, name in enumerate(all_names)}
+
+    def columns(names: tuple[str, ...]) -> np.ndarray:
+        return values[:, [column[name] for name in names]]
+
+    route_name = task.get("route")
+    desc_names = (
+        _resolve_blocks(config.routes[route_name], blocks)
+        if route_name and route_name in config.routes
+        else all_names
+    )
+    prior_name = task.get("prior")
+    prior_names = (
+        _resolve_blocks(config.priors[prior_name].use, blocks)
+        if prior_name and prior_name in config.priors
+        else ()
+    )
+    desc = columns(desc_names) if desc_names else None
+    prior = columns(prior_names) if prior_names else None
+    return desc, prior
+
+
 def _run_predict(args: argparse.Namespace) -> int:
     ckpt_path = Path(args.checkpoint).expanduser().resolve()
     if not ckpt_path.is_file():
@@ -144,18 +214,23 @@ def _run_predict(args: argparse.Namespace) -> int:
     task_kind = metadata.get("task_kind", "scalar")
     out_dim = metadata.get("out_dim", 1)
     desc_dim = metadata.get("descriptor_dim", 0)
+    prior_obj = _prior_from_metadata(metadata)
 
     if "ensemble_state_dicts" in checkpoint:
         members = []
         for state in checkpoint["ensemble_state_dicts"]:
-            m = build_hybrid_model(model_spec, task_kind=task_kind, out_dim=out_dim, descriptor_dim=desc_dim)
+            m = build_hybrid_model(
+                model_spec, task_kind=task_kind, out_dim=out_dim, descriptor_dim=desc_dim, prior=prior_obj
+            )
             m.load_state_dict(state)
             m.eval()
             members.append(m)
         from .models.ensemble import EnsembleModel
         model = EnsembleModel(members)
     else:
-        model = build_hybrid_model(model_spec, task_kind=task_kind, out_dim=out_dim, descriptor_dim=desc_dim)
+        model = build_hybrid_model(
+            model_spec, task_kind=task_kind, out_dim=out_dim, descriptor_dim=desc_dim, prior=prior_obj
+        )
         load_model_checkpoint(model, ckpt_path)
         model.eval()
 
@@ -174,11 +249,17 @@ def _run_predict(args: argparse.Namespace) -> int:
     batch_size = args.batch_size or 64
     all_preds: list[float | list[float]] = []
     all_vars: list[float | None] = []
+    desc_all, prior_all = _predict_feature_inputs(metadata, smiles_list)
     with torch.no_grad():
         for i in range(0, len(smiles_list), batch_size):
             chunk = smiles_list[i : i + batch_size]
             bg = collate_mol_graphs(chunk)
-            out = model({"graph": bg})
+            inputs: dict[str, Any] = {"graph": bg}
+            if desc_all is not None:
+                inputs["descriptors"] = torch.as_tensor(desc_all[i : i + len(chunk)], dtype=torch.float32)
+            if prior_all is not None:
+                inputs["prior"] = torch.as_tensor(prior_all[i : i + len(chunk)], dtype=torch.float32)
+            out = model(inputs)
             preds = out.get("prediction", out.get("mean"))
             if task_kind in {"binary_classification", "multilabel_classification"}:
                 preds = torch.sigmoid(preds)
@@ -200,9 +281,9 @@ def _run_predict(args: argparse.Namespace) -> int:
             header.append("variance")
         writer.writerow(header)
         for s, p, v in zip(smiles_list, all_preds, all_vars):
-            row_out = [s, json.dumps(p) if isinstance(p, list) else f"{p:.6g}"]
+            row_out = [s, json.dumps(p) if isinstance(p, list) else f"{p:.10g}"]
             if has_var:
-                row_out.append(f"{v:.6g}" if v is not None else "")
+                row_out.append(f"{v:.10g}" if v is not None else "")
             writer.writerow(row_out)
     print(json.dumps({"predicted": True, "count": len(smiles_list), "output": str(output_path)}, indent=2))
     return 0
@@ -237,7 +318,7 @@ def _run_inspect(args: argparse.Namespace) -> int:
     return 0
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="chemistry-framework")
+    parser = argparse.ArgumentParser(prog="molledger")
     commands = parser.add_subparsers(dest="command", required=True)
     validate = commands.add_parser("validate", help="validate an experiment YAML file")
     validate.add_argument("config")
@@ -343,7 +424,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
     except (FileNotFoundError, ImportError, KeyError, TypeError, ValueError, RuntimeError) as exc:
-        print(f"chemistry-framework: error: {exc}", file=sys.stderr)
+        print(f"molledger: error: {exc}", file=sys.stderr)
         return 2
 
 if __name__ == "__main__":

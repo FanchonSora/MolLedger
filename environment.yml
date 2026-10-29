@@ -1,4 +1,4 @@
-name: chemistry-framework
+name: molledger
 channels:
   - conda-forge
 dependencies:

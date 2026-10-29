@@ -7,7 +7,7 @@ import zlib
 import numpy as np
 import pytest
 
-from chemistry_framework.feature_analysis import (
+from molledger.feature_analysis import (
     ModelContribution,
     PriorCoefficientEvidence,
     analyze_feature_evidence,
@@ -15,8 +15,8 @@ from chemistry_framework.feature_analysis import (
     permutation_group_importance,
     summarize_prior_coefficients,
 )
-from chemistry_framework.features import FeatureMatrix, FeatureRegistry, FeatureSpec
-from chemistry_framework.splits import DatasetSplit
+from molledger.features import FeatureMatrix, FeatureRegistry, FeatureSpec
+from molledger.splits import DatasetSplit
 
 def _feature_fixture():
     registry = FeatureRegistry()
@@ -225,7 +225,7 @@ def test_leave_group_out_retrains_for_each_feature_subset() -> None:
     assert result["fragment"].mean_delta == pytest.approx(2.5)
 
 def test_select_evidence_recommendation_prunes_redundancy() -> None:
-    from chemistry_framework.feature_analysis import select_evidence_recommendation
+    from molledger.feature_analysis import select_evidence_recommendation
 
     np.random.seed(42)
     y = np.linspace(0, 10, 100)

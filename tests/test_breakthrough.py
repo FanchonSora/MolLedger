@@ -3,19 +3,19 @@ import numpy as np
 import pytest
 import torch
 from rdkit import Chem
-from chemistry_framework.analysis import DatasetAdvisor
-from chemistry_framework.config import ExperimentConfig, ModelSpec
-from chemistry_framework.data.graph import BatchMolGraph, mol_to_graph, collate_mol_graphs
-from chemistry_framework.encoders.gnn import DMPNNEncoder, GINEncoder
-from chemistry_framework.evaluation.metrics import regression_metrics
-from chemistry_framework.features.pharmacophore import (
+from molledger.analysis import DatasetAdvisor
+from molledger.config import ExperimentConfig, ModelSpec
+from molledger.data.graph import BatchMolGraph, mol_to_graph, collate_mol_graphs
+from molledger.encoders.gnn import DMPNNEncoder, GINEncoder
+from molledger.evaluation.metrics import regression_metrics
+from molledger.features.pharmacophore import (
     AutoPharmacophoreBlock,
     extract_morgan_fingerprints,
     extract_rdkit_2d_descriptors,
     select_top_features,
 )
-from chemistry_framework.models.hybrid import build_hybrid_model
-from chemistry_framework.training.engine import _focal_loss, _pairwise_ranking_loss, train_model
+from molledger.models.hybrid import build_hybrid_model
+from molledger.training.engine import _focal_loss, _pairwise_ranking_loss, train_model
 
 def test_extract_morgan_fingerprints():
     smiles = ["c1ccccc1", "c1ccccc1O", "CC(=O)O"]

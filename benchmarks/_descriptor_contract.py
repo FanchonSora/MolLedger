@@ -11,7 +11,7 @@ This module pins the contract by column name (the same names are stored in
 :func:`select_contract_columns`, which reorders whatever the installed RDKit
 returns down to the published columns::
 
-    from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors
+    from molledger.features.pharmacophore import extract_rdkit_2d_descriptors
     from benchmarks._descriptor_contract import select_contract_columns
 
     matrix, names = select_contract_columns(*extract_rdkit_2d_descriptors(smiles))

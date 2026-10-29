@@ -14,7 +14,7 @@ import pytest
 torch = pytest.importorskip("torch")
 pytest.importorskip("rdkit")
 
-from chemistry_framework.cli import main as cli_main
+from molledger.cli import main as cli_main
 
 
 TABLE = [

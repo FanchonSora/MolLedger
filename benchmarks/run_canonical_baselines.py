@@ -31,9 +31,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemistry_framework.features.pharmacophore import extract_morgan_fingerprints, extract_rdkit_2d_descriptors
-from chemistry_framework.data.graph import mol_to_graph, BatchMolGraph
-from chemistry_framework.encoders.gnn import DMPNNEncoder
+from molledger.features.pharmacophore import extract_morgan_fingerprints, extract_rdkit_2d_descriptors
+from molledger.data.graph import mol_to_graph, BatchMolGraph
+from molledger.encoders.gnn import DMPNNEncoder
 from benchmarks._seeds import DEFAULT_SEEDS, add_seed_argument, resolve_seeds
 
 DATA_DIR = REPO_ROOT / "data" / "moleculenet"

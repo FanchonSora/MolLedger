@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import numpy as np
 import pytest
-from chemistry_framework.analysis import (
+from molledger.analysis import (
     AdvisorRecommendation,
     ChemicalProfile,
     DatasetAdvisor,
@@ -12,8 +12,8 @@ from chemistry_framework.analysis import (
     TabularFeatureProfile,
     TargetProfile,
 )
-from chemistry_framework.cli import main
-from chemistry_framework.config.schema import ExperimentConfig
+from molledger.cli import main
+from molledger.config.schema import ExperimentConfig
 
 def test_advisor_profiles_classification_dataset():
     advisor = DatasetAdvisor()
@@ -127,7 +127,7 @@ def test_advisor_formats_and_exports_reports(tmp_path: Path):
     features = {"tpsa": np.linspace(10.0, 90.0, len(smiles)).tolist()}
     report = advisor.profile_dataset(smiles, targets, tabular_features=features, dataset_name="export_test")
     console_str = advisor.format_console_report(report)
-    assert "CHEMISTRY FRAMEWORK: DATASET HEALTH & ADVISORY REPORT" in console_str
+    assert "MOLLEDGER: DATASET HEALTH & ADVISORY REPORT" in console_str
     assert "export_test" in console_str
     assert "PRESCRIPTIVE TRAINING RECOMMENDATIONS" in console_str
     md_str = advisor.format_markdown_report(report)

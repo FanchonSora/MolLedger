@@ -15,12 +15,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemistry_framework.config import ExperimentConfig, load_config
-from chemistry_framework.data import make_experiment_dataloaders
-from chemistry_framework.evaluation import evaluate_model
-from chemistry_framework.experiment import fit_experiment_prior, prepare_experiment
-from chemistry_framework.models import build_hybrid_model
-from chemistry_framework.training import train_ensemble, train_model
+from molledger.config import ExperimentConfig, load_config
+from molledger.data import make_experiment_dataloaders
+from molledger.evaluation import evaluate_model
+from molledger.experiment import fit_experiment_prior, prepare_experiment
+from molledger.models import build_hybrid_model
+from molledger.training import train_ensemble, train_model
 
 PUBLISHED_WORKS = {
     "caco2": {
@@ -318,7 +318,7 @@ def main():
     report_lines = [
         "# Empirical Comparison: Before vs After Advisor Recommendations",
         "",
-        "This report systematically evaluates the impact of the **Chemistry Framework** and its **Automated Dataset Advisor** on standard ADMET benchmarks (Bemis-Murcko Scaffold Split 80/10/10).",
+        "This report systematically evaluates the impact of the **MolLedger** and its **Automated Dataset Advisor** on standard ADMET benchmarks (Bemis-Murcko Scaffold Split 80/10/10).",
         "",
         "## 1. Summary Comparison Table",
         "",

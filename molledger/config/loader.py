@@ -10,7 +10,7 @@ def load_config(path: str | Path) -> ExperimentConfig:
     try:
         import yaml
     except ImportError as exc:
-        raise ImportError("YAML config loading requires PyYAML; install chemistry-framework[config]") from exc
+        raise ImportError("YAML config loading requires PyYAML; install molledger[config]") from exc
     with config_path.open(encoding="utf-8") as stream:
         document: Any = yaml.safe_load(stream)
     if document is None:

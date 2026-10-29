@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-from chemistry_framework import (
+from molledger import (
     CallablePhysicsPrior,
     CompositePrior,
     FeatureRegistry,
@@ -21,13 +21,13 @@ from chemistry_framework import (
     diagnose_features,
     molecular_feature_registry,
 )
-from chemistry_framework.diagnostics import diagnose_features as diagnose_features_layer
-from chemistry_framework.encoders import MLPEncoder as MLPEncoder_layer
-from chemistry_framework.features import FeatureRegistry as FeatureRegistry_layer
-from chemistry_framework.heads import NASA7OutputBlock as NASA7OutputBlock_layer
-from chemistry_framework.models import ResidualPropertyModel as ResidualPropertyModel_layer
-from chemistry_framework.priors import LinearAdditivePrior as LinearAdditivePrior_layer
-from chemistry_framework.tasks import PropertyTask as PropertyTask_layer
+from molledger.diagnostics import diagnose_features as diagnose_features_layer
+from molledger.encoders import MLPEncoder as MLPEncoder_layer
+from molledger.features import FeatureRegistry as FeatureRegistry_layer
+from molledger.heads import NASA7OutputBlock as NASA7OutputBlock_layer
+from molledger.models import ResidualPropertyModel as ResidualPropertyModel_layer
+from molledger.priors import LinearAdditivePrior as LinearAdditivePrior_layer
+from molledger.tasks import PropertyTask as PropertyTask_layer
 
 def test_layer_packages_expose_top_level_public_components() -> None:
     assert FeatureRegistry_layer is FeatureRegistry

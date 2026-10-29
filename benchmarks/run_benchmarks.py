@@ -12,12 +12,12 @@ import torch
 REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
-from chemistry_framework.config import ExperimentConfig, load_config
-from chemistry_framework.data import make_experiment_dataloaders
-from chemistry_framework.evaluation import evaluate_model
-from chemistry_framework.experiment import fit_experiment_prior, prepare_experiment
-from chemistry_framework.models import build_hybrid_model
-from chemistry_framework.training import train_ensemble, train_model
+from molledger.config import ExperimentConfig, load_config
+from molledger.data import make_experiment_dataloaders
+from molledger.evaluation import evaluate_model
+from molledger.experiment import fit_experiment_prior, prepare_experiment
+from molledger.models import build_hybrid_model
+from molledger.training import train_ensemble, train_model
 
 BENCHMARK_CONFIGS = [
     ("BBB Martins (Penetration)", "bbb_martins_dmpnn.yaml"),
@@ -136,7 +136,7 @@ def run_single_benchmark(config_path: Path,results_dir: Path,device: str = "auto
     with torch.no_grad():
         for b_inputs, _ in loaders.test:
             if isinstance(b_inputs, dict):
-                from chemistry_framework.training.engine import _transfer_to_device
+                from molledger.training.engine import _transfer_to_device
                 b_in = _transfer_to_device(b_inputs, dev)
                 out = model(b_in)
                 if isinstance(out, dict):
@@ -167,7 +167,7 @@ def run_single_benchmark(config_path: Path,results_dir: Path,device: str = "auto
     }
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run chemical benchmarks with Chemistry Framework")
+    parser = argparse.ArgumentParser(description="Run chemical benchmarks with MolLedger")
     parser.add_argument(
         "--configs-dir",
         type=str,
@@ -225,10 +225,10 @@ def main() -> int:
 
     report_md_path = results_dir / "benchmark_report.md"
     with open(report_md_path, "w", encoding="utf-8") as f:
-        f.write("# Chemistry Framework - Benchmark Evaluation Report\n\n")
+        f.write("# MolLedger - Benchmark Evaluation Report\n\n")
         f.write(f"Generated at: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
         f.write("## 1. Overview\n")
-        f.write("This report provides empirical validation of the upgraded **Chemistry Framework** across standard Therapeutic Data Commons (TDC) ADMET benchmarks. ")
+        f.write("This report provides empirical validation of the upgraded **MolLedger** across standard Therapeutic Data Commons (TDC) ADMET benchmarks. ")
         f.write("The models evaluate both molecular graph representation learning (Chemprop-style D-MPNN, GIN), physics-informed feature fusion, Evidential Uncertainty Quantification, and Deep Ensembles.\n\n")
         f.write("## 2. Benchmark Summary Table\n\n")
         f.write("| Benchmark | Dataset | Task Type | Architecture | Best Val Loss | Test Performance | Time (s) |\n")

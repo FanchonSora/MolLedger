@@ -20,8 +20,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors
-from chemistry_framework.feature_analysis import select_evidence_recommendation
+from molledger.features.pharmacophore import extract_rdkit_2d_descriptors
+from molledger.feature_analysis import select_evidence_recommendation
 from benchmarks._seeds import DEFAULT_SEEDS, add_seed_argument, resolve_seeds
 
 DATA_DIR = REPO_ROOT / "data" / "moleculenet"

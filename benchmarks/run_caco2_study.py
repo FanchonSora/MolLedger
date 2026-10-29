@@ -15,13 +15,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from chemistry_framework.analysis import DatasetAdvisor
-from chemistry_framework.config import ExperimentConfig, load_config
-from chemistry_framework.data import make_experiment_dataloaders
-from chemistry_framework.evaluation import evaluate_model
-from chemistry_framework.experiment import prepare_experiment
-from chemistry_framework.models import build_hybrid_model
-from chemistry_framework.training import train_model
+from molledger.analysis import DatasetAdvisor
+from molledger.config import ExperimentConfig, load_config
+from molledger.data import make_experiment_dataloaders
+from molledger.evaluation import evaluate_model
+from molledger.experiment import prepare_experiment
+from molledger.models import build_hybrid_model
+from molledger.training import train_model
 
 PUBLISHED_REFERENCE = {
     "Chemprop (D-MPNN)": {"mae": 0.380, "rmse": 0.540, "r2": 0.580},

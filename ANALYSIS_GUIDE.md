@@ -1,6 +1,6 @@
 # Hướng dẫn Phân tích Đặc trưng và Đọc Báo cáo Dữ liệu (Analysis Guide)
 
-Tài liệu này cung cấp hướng dẫn toàn diện về cách sử dụng công cụ **Dataset & Feature Analysis Advisor** trong `chemistry-framework`, cách chạy phân tích từ dòng lệnh (CLI) hoặc Python API, và cách diễn giải chi tiết từng chỉ số trong **Báo cáo Terminal** cũng như **Báo cáo Markdown/HTML**.
+Tài liệu này cung cấp hướng dẫn toàn diện về cách sử dụng công cụ **Dataset & Feature Analysis Advisor** trong `molledger`, cách chạy phân tích từ dòng lệnh (CLI) hoặc Python API, và cách diễn giải chi tiết từng chỉ số trong **Báo cáo Terminal** cũng như **Báo cáo Markdown/HTML**.
 
 ---
 
@@ -39,25 +39,25 @@ Framework cung cấp module **`DatasetAdvisor`** nhằm tự động kiểm tra 
 
 ### Chạy nhanh từ dòng lệnh (CLI)
 
-Lệnh `chemistry-framework inspect` nhận đầu vào là file CSV dữ liệu hoặc file cấu hình YAML:
+Lệnh `molledger inspect` nhận đầu vào là file CSV dữ liệu hoặc file cấu hình YAML:
 
 ```bash
 # 1. Phân tích trực tiếp từ file CSV
-chemistry-framework inspect data/my_compounds.csv
+molledger inspect data/my_compounds.csv
 
 # 2. Phân tích với chỉ định rõ cột SMILES và cột nhãn
-chemistry-framework inspect data/my_compounds.csv \
+molledger inspect data/my_compounds.csv \
   --smiles-column smiles \
   --target pIC50
 
 # 3. Phân tích, tự động xuất file cấu hình YAML tối ưu và lưu báo cáo chi tiết
-chemistry-framework inspect data/my_compounds.csv \
+molledger inspect data/my_compounds.csv \
   --target pIC50 \
   --generate-config configs/auto_pipeline.yaml \
   --output-dir reports/dataset_inspection
 
 # 4. Phân tích tập dữ liệu đã khai báo trong file YAML
-chemistry-framework inspect benchmarks/configs/caco2_dmpnn.yaml
+molledger inspect benchmarks/configs/caco2_dmpnn.yaml
 ```
 
 **Các tùy chọn dòng lệnh chính:**
@@ -74,7 +74,7 @@ chemistry-framework inspect benchmarks/configs/caco2_dmpnn.yaml
 Bạn có thể tích hợp việc phân tích vào Jupyter Notebook hoặc pipeline Python:
 
 ```python
-from chemistry_framework import DatasetAdvisor
+from molledger import DatasetAdvisor
 
 advisor = DatasetAdvisor()
 
@@ -110,7 +110,7 @@ Dưới đây là một mẫu báo cáo Terminal đầy đủ:
 
 ```text
 ==============================================================================
- 🧪 CHEMISTRY FRAMEWORK: DATASET HEALTH & ADVISORY REPORT
+ 🧪 MOLLEDGER: DATASET HEALTH & ADVISORY REPORT
 ==============================================================================
  Dataset: custom_assay_screen             Health Score: 85/100 [🟢 EXCELLENT]
 ------------------------------------------------------------------------------
@@ -282,7 +282,7 @@ Chứa toàn bộ dữ liệu thống kê có cấu trúc JSON dành cho việc 
 Bên cạnh phân tích dữ liệu trước huấn luyện (`inspect`), framework còn cung cấp lệnh phân tích chuyên sâu các đặc trưng hóa học được trích xuất trong quá trình `prepare`:
 
 ```bash
-chemistry-framework analyze config.yaml
+molledger analyze config.yaml
 ```
 
 Lệnh này sẽ sinh ra 4 artifacts trong thư mục `analysis.output_dir`:
@@ -298,19 +298,19 @@ Lệnh này sẽ sinh ra 4 artifacts trong thư mục `analysis.output_dir`:
 
 ## 6. Tự động sinh File Cấu hình YAML và Bắt đầu Train
 
-Điểm mạnh của `chemistry-framework inspect` là bạn không cần phải tự viết tay file cấu hình YAML từ đầu. Hãy để Advisor sinh file tối ưu cho bạn:
+Điểm mạnh của `molledger inspect` là bạn không cần phải tự viết tay file cấu hình YAML từ đầu. Hãy để Advisor sinh file tối ưu cho bạn:
 
 ```bash
 # Bước 1: Khảo sát dữ liệu và sinh cấu hình tối ưu
-chemistry-framework inspect data/my_assay.csv \
+molledger inspect data/my_assay.csv \
   --target IC50 \
   --generate-config configs/my_assay_pipeline.yaml
 
 # Bước 2: Kiểm tra tính hợp lệ của file cấu hình
-chemistry-framework validate configs/my_assay_pipeline.yaml
+molledger validate configs/my_assay_pipeline.yaml
 
 # Bước 3: Huấn luyện mô hình ngay lập tức theo đúng khuyến nghị
-chemistry-framework train configs/my_assay_pipeline.yaml
+molledger train configs/my_assay_pipeline.yaml
 ```
 
 Mô hình sẽ tự động áp dụng đúng cấu trúc (D-MPNN/GIN, Hybrid, Huber/BCE loss, Cosine scheduler) phù hợp nhất với dữ liệu của bạn!

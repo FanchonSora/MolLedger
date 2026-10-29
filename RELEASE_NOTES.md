@@ -1,14 +1,14 @@
-# Release notes for chemistry-framework 1.0.0
+# Release notes for molledger 1.0.0
 
 Version 1.0.0 is the archived version of the software reported in the Journal of
-Cheminformatics **Software article** "chemistry-framework: a configuration-driven and
+Cheminformatics **Software article** "molledger: a configuration-driven and
 replayable workflow for molecular property modelling".
 
 This repository is the archived release of that work. It is frozen: further
 development happens elsewhere, and the manuscript cites the `v1.0.0` tag rather than
 the default branch. The fixed URL is
 
-    https://github.com/FanchonSora/Chemistry-Framework/releases/tag/v1.0.0
+    https://github.com/FanchonSora/MolLedger/releases/tag/v1.0.0
 
 ## Before creating the release
 
@@ -33,7 +33,7 @@ the default branch. The fixed URL is
 
 ## What the release contains
 
-- `chemistry_framework/` - the framework (configuration system, feature analysis and
+- `molledger/` - the framework (configuration system, feature analysis and
   data audit, hybrid modelling layer).
 - `benchmarks/splits/` - 20 Bemis-Murcko scaffold manifests per endpoint.
 - `benchmarks/results/` - per-split results in CSV and JSON, including the files that

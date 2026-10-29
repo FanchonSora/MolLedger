@@ -1,7 +1,7 @@
 # Configuration reference
 
 An experiment is one YAML file validated against the typed schema in
-`chemistry_framework/config/schema.py`. Validation runs before any computation;
+`molledger/config/schema.py`. Validation runs before any computation;
 an unknown key, an unknown feature name, or a route that points at a feature
 block that does not exist is reported as an error.
 

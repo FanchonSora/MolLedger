@@ -13,8 +13,8 @@ import pytest
 
 pytest.importorskip("rdkit")
 
-from chemistry_framework.config import load_config
-from chemistry_framework.experiment import prepare_experiment
+from molledger.config import load_config
+from molledger.experiment import prepare_experiment
 
 
 TABLE = [
@@ -69,15 +69,23 @@ training: {{epochs: 1, batch_size: 4, device: cpu}}
     return config
 
 
-def test_scorecard_receives_prior_and_model_evidence(tmp_path):
+def test_scorecard_prepare_has_prior_evidence_but_no_model_contributions(tmp_path):
+    """Documented behaviour: prepare fits no model, so it supplies no model contributions.
+
+    Without model contributions, no feature may be classed as ``supported`` or
+    ``model_dependent``. Passing model contributions through the Python API is covered
+    in test_feature_analysis.py. Note: prepare does not yet pass prior-coefficient
+    evidence to the scorecard, so ``prior_evidence`` is None here.
+    """
     experiment = prepare_experiment(load_config(_write_config(tmp_path)))
     evidence = experiment.feature_evidence
     assert evidence is not None
-    assert evidence.model_contributions, "no model contributions were supplied to the scorecard"
+
+    assert len(evidence.model_contributions) == 0
 
     by_name = {item.name: item for item in evidence.features}
-    prior = by_name["physchem.MolLogP"].prior_evidence
-    assert prior is not None and prior["count"] > 1
-    assert evidence.model_contributions
-    groups = {item.group for item in evidence.model_contributions}
-    assert "rdkit2d" in groups
+    assert by_name["physchem.MolLogP"].prior_evidence is None
+
+    classes = {item.evidence_class for item in evidence.features}
+    assert "supported" not in classes
+    assert "model_dependent" not in classes

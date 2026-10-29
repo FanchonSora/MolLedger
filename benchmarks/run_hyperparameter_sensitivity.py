@@ -36,8 +36,8 @@ from benchmarks.run_evidence_routing_experiment import (  # noqa: E402
     collate_graph_batch,
     train_and_eval_model,
 )
-from chemistry_framework.data.graph import mol_to_graph  # noqa: E402
-from chemistry_framework.features.pharmacophore import extract_rdkit_2d_descriptors  # noqa: E402
+from molledger.data.graph import mol_to_graph  # noqa: E402
+from molledger.features.pharmacophore import extract_rdkit_2d_descriptors  # noqa: E402
 
 DATA_DIR = REPO_ROOT / "data" / "moleculenet"
 RESULTS_DIR = REPO_ROOT / "benchmarks" / "results"

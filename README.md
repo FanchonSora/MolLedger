@@ -12,7 +12,7 @@ Designed as an extensible platform for molecular property prediction, ADMET prof
 
 ## 📄 Bài báo & tái lập kết quả (Publication & reproducibility)
 
-Kho mã này là bản phát hành đi kèm bài báo **"chemistry-framework: a configuration-driven and replayable workflow for molecular property modelling"** (Software article, gửi *Journal of Cheminformatics*; bản trước có tên làm việc "Evidence before prediction: a configuration-driven framework for testing how molecular descriptors shape property models"):
+Kho mã này là bản phát hành đi kèm bài báo **"molledger: a configuration-driven and replayable workflow for molecular property modelling"** (Software article, gửi *Journal of Cheminformatics*; bản trước có tên làm việc "Evidence before prediction: a configuration-driven framework for testing how molecular descriptors shape property models"):
 
 - 📦 **Kết quả bài báo**: kết quả thô theo từng split nằm trong [`benchmarks/results/`](benchmarks/results/); split manifests (20 seed/tập, bài báo dùng seed 1–10) ở [`benchmarks/splits/`](benchmarks/splits/).
 - 🔬 **Cách tái lập từng bảng/hình**: [`REPRODUCING.md`](REPRODUCING.md) — mỗi artifact đều có lệnh tương ứng, kèm cảnh báo về phiên bản RDKit cần pin.
@@ -55,7 +55,7 @@ Kho mã này là bản phát hành đi kèm bài báo **"chemistry-framework: a 
 
 ### Cài đặt qua Git:
 ```bash
-git clone https://github.com/FanchonSora/Chemistry-Framework.git
+git clone https://github.com/FanchonSora/MolLedger.git
 cd Framework-Chemistry
 pip install -e ".[chemistry,test]"
 ```
@@ -69,7 +69,7 @@ pip install -e ".[chemistry,test]"
 Kiểm tra cài đặt:
 ```bash
 pytest tests/
-chemistry-framework --help
+molledger --help
 ```
 
 ---
@@ -88,7 +88,7 @@ flowchart LR
 ### Bước 1: Khảo sát dữ liệu & Tự động sinh cấu hình (`inspect`)
 Thay vì phải tự viết file YAML từ đầu, hãy để Advisor khảo sát dữ liệu của bạn, đánh giá rủi ro và tự động xuất ra file cấu hình tối ưu:
 ```bash
-chemistry-framework inspect data/my_compounds.csv \
+molledger inspect data/my_compounds.csv \
   --smiles-column smiles \
   --target activity \
   --generate-config configs/my_experiment.yaml \
@@ -97,26 +97,26 @@ chemistry-framework inspect data/my_compounds.csv \
 
 ### Bước 2: Kiểm tra tính hợp lệ của cấu hình (`validate`)
 ```bash
-chemistry-framework validate configs/my_experiment.yaml
+molledger validate configs/my_experiment.yaml
 ```
 
 ### Bước 3: Chuẩn bị dữ liệu, chia tập & trích xuất scorecard (`prepare`)
 Chia dữ liệu (Scaffold/Random), tính toán ma trận đặc trưng, lưu cache, và xuất báo cáo bằng chứng đặc trưng (HTML, CSV, Heatmap PNG):
 ```bash
-chemistry-framework prepare configs/my_experiment.yaml
+molledger prepare configs/my_experiment.yaml
 ```
 
 ### Bước 4: Huấn luyện mô hình (`train`)
 Huấn luyện mô hình Hybrid, D-MPNN, GIN hoặc Deep Ensemble theo đúng cấu hình:
 ```bash
-chemistry-framework train configs/my_experiment.yaml
+molledger train configs/my_experiment.yaml
 ```
 Kết quả huấn luyện và checkpoint `.pt` sẽ được lưu trong thư mục `checkpoint_dir`.
 
 ### Bước 5: Dự đoán cho các phân tử mới (`predict`)
 Dự đoán nhãn và độ bất định (variance) cho một tập hợp các phân tử SMILES mới:
 ```bash
-chemistry-framework predict \
+molledger predict \
   --checkpoint outputs/checkpoints/my_task.pt \
   --input data/screen_candidates.csv \
   --smiles-column smiles \
@@ -385,7 +385,7 @@ evaluation:
 ## 🐍 Sử dụng Framework qua Python API
 
 ```python
-from chemistry_framework import (
+from molledger import (
     load_config,
     prepare_experiment,
     build_hybrid_model,
