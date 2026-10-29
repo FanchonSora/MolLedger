@@ -1,14 +1,14 @@
-# Release notes for molledger 1.0.0
+# Release notes for molledger 1.0.1
 
-Version 1.0.0 is the archived version of the software reported in the Journal of
+Version 1.0.1 is the archived version of the software reported in the Journal of
 Cheminformatics **Software article** "molledger: a configuration-driven and
 replayable workflow for molecular property modelling".
 
 This repository is the archived release of that work. It is frozen: further
-development happens elsewhere, and the manuscript cites the `v1.0.0` tag rather than
+development happens elsewhere, and the manuscript cites the `v1.0.1` tag rather than
 the default branch. The fixed URL is
 
-    https://github.com/FanchonSora/MolLedger/releases/tag/v1.0.0
+    https://github.com/FanchonSora/MolLedger/releases/tag/v1.0.1
 
 ## Before creating the release
 
@@ -21,9 +21,9 @@ the default branch. The fixed URL is
 
 ## Creating the release
 
-1. Tag the release commit: `git tag -a v1.0.0 -m "Version cited by paper 1"`.
+1. Tag the release commit: `git tag -a v1.0.1 -m "Version cited by paper 1"`.
 2. Push the tag and the branch: `git push origin main --tags`.
-3. Create the GitHub release `v1.0.0` from that tag. The release page is the stable
+3. Create the GitHub release `v1.0.1` from that tag. The release page is the stable
    identifier used in the manuscript's "Archived releases" line and in the reference
    to the software.
 4. If the release URL ever changes, update

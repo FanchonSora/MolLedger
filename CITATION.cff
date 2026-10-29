@@ -1,6 +1,6 @@
 # Citation metadata for the molledger software release.
 #
-# The archived version is the GitHub release tagged v1.0.0 in this repository;
+# The archived version is the GitHub release tagged v1.0.1 in this repository;
 # cite that tag rather than the moving default branch.
 cff-version: 1.2.0
 message: "If you use this software, please cite the manuscript and the archived release."
@@ -13,7 +13,7 @@ abstract: >-
   prior/residual predictor, benchmark runners, archived per-split results, and the
   statistics scripts that regenerate every paired comparison reported in the manuscript.
 type: software
-version: "1.0.0"
+version: "1.0.1"
 date-released: "2026-10-19"
 license: MIT
 repository-code: "https://github.com/FanchonSora/MolLedger"

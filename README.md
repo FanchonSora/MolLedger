@@ -19,7 +19,7 @@ Kho mã này là bản phát hành đi kèm bài báo **"molledger: a configurat
 - 📈 **Thống kê so sánh cặp**: `python benchmarks/paper_statistics.py` (hiệu chỉnh Nadeau–Bengio + Holm–Bonferroni) và `python benchmarks/generate_si_tables.py`.
 - ✅ **Kiểm chứng**: `python benchmarks/validate_paper_statistics.py` tái tính 2.024 đại lượng từ điểm per-split (184 so sánh cặp) và kiểm tra tính nhất quán.
 - 🧪 **Kiểm tra phân phối tự do và độ nhạy**: `python benchmarks/statistical_robustness.py` (permutation chính xác, Friedman/Nemenyi, đối chứng ngẫu nhiên 50 lần rút), `python benchmarks/run_random_control_study.py --dataset all --draws 50`, `python benchmarks/run_hyperparameter_sensitivity.py`, `python benchmarks/run_redundancy_sensitivity.py`; bảng SI sinh bởi `generate_robustness_tables.py` và `generate_sensitivity_tables.py`.
-- 📚 **Trích dẫn**: [`CITATION.cff`](CITATION.cff); bản lưu trữ cố định là GitHub Release **v1.0.0** (`/releases/tag/v1.0.0`), quy trình tạo release nằm ở [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
+- 📚 **Trích dẫn**: [`CITATION.cff`](CITATION.cff); bản lưu trữ cố định là GitHub Release **v1.0.1** (`/releases/tag/v1.0.1`), quy trình tạo release nằm ở [`RELEASE_NOTES.md`](RELEASE_NOTES.md).
 
 ---
 
